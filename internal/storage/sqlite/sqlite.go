@@ -79,3 +79,16 @@ func (s *Storage) GetUrl(alias string) (string, error) {
 
 	return resUrl, nil
 }
+
+func (s *Storage) DeleteUrl(alias string) error {
+	const fn = "storage.sqlite.DeleteUrl"
+	stmt, err := s.db.Prepare("DELETE FROM url WHERE alias = ?")
+	if err != nil {
+		return fmt.Errorf("%s: prepare statement %w", fn, err)
+	}
+	_, err = stmt.Exec(alias)
+	if err != nil {
+		return fmt.Errorf("%s: execute statement: %w", fn, err)
+	}
+	return nil
+}
