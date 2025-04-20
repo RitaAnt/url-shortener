@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/mattn/go-sqlite3"
 	_ "github.com/mattn/go-sqlite3" //init sqlite3 driver
@@ -57,4 +58,24 @@ func (s *Storage) SaveUrl(urlToSave string, alias string) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) GetUrl(alias string) (string, error) {
+	const fn = "storage.sqlite.GetUrl"
+
+	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = ?")
+	if err != nil {
+		return "", fmt.Errorf("%s: prepare statement %w", fn, err)
+	}
+
+	var resUrl string
+	err = stmt.QueryRow(alias).Scan(&resUrl)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", storage.ErrURLNotFound
+		}
+		return "", fmt.Errorf("%s: execute statement: %w", fn, err)
+	}
+
+	return resUrl, nil
 }
