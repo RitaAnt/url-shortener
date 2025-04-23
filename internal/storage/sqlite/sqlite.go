@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mattn/go-sqlite3"
-	_ "github.com/mattn/go-sqlite3" //init sqlite3 driver
 	"url-shortener/internal/storage"
 )
 
@@ -41,7 +40,7 @@ func New(storagePath string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveUrl(urlToSave string, alias string) error {
+func (s *Storage) SaveURL(urlToSave string, alias string) error {
 	const fn = "storage.sqlite.SaveUrl"
 
 	stmt, err := s.db.Prepare("INSERT INTO url (alias, url) VALUES (?, ?)")
@@ -60,7 +59,7 @@ func (s *Storage) SaveUrl(urlToSave string, alias string) error {
 	return nil
 }
 
-func (s *Storage) GetUrl(alias string) (string, error) {
+func (s *Storage) GetURL(alias string) (string, error) {
 	const fn = "storage.sqlite.GetUrl"
 
 	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = ?")
@@ -80,7 +79,7 @@ func (s *Storage) GetUrl(alias string) (string, error) {
 	return resUrl, nil
 }
 
-func (s *Storage) DeleteUrl(alias string) error {
+func (s *Storage) DeleteURL(alias string) error {
 	const fn = "storage.sqlite.DeleteUrl"
 	stmt, err := s.db.Prepare("DELETE FROM url WHERE alias = ?")
 	if err != nil {
