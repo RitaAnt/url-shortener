@@ -20,13 +20,14 @@ type Request struct {
 
 type Response struct {
 	response.Response
-	Alias string `json:"error,omitempty"`
+	Alias string `json:"alias,omitempty"`
 }
 
 const aliasLength = 6
 
+//go:generate mockery --name=URLSaver
 type URLSaver interface {
-	SaveUrl(urlToSave string, alias string) error
+	SaveURL(urlToSave string, alias string) error
 }
 
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
@@ -62,7 +63,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			alias = random.NewRandomString(aliasLength)
 		}
 
-		err = urlSaver.SaveUrl(req.Url, alias)
+		err = urlSaver.SaveURL(req.Url, alias)
 		if errors.Is(err, storage.ErrURLExists) {
 			log.Info("url already exists", slog.String("url", req.Url))
 
