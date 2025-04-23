@@ -20,19 +20,19 @@ func New(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", fn, err)
 	}
 
-	stmt, err := db.Prepare(`
+	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS url (
 		id INTEGER PRIMARY KEY,
 		alias TEXT NOT NULL UNIQUE,
-		URL TEXT NOT NULL);
-	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);
+		url TEXT NOT NULL
 	)`)
-
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", fn, err)
 	}
 
-	_, err = stmt.Exec()
+	_, err = db.Exec(`
+	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias)
+`)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", fn, err)
 	}
@@ -67,8 +67,8 @@ func (s *Storage) GetURL(alias string) (string, error) {
 		return "", fmt.Errorf("%s: prepare statement %w", fn, err)
 	}
 
-	var resUrl string
-	err = stmt.QueryRow(alias).Scan(&resUrl)
+	var resURL string
+	err = stmt.QueryRow(alias).Scan(&resURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", storage.ErrURLNotFound
@@ -76,16 +76,12 @@ func (s *Storage) GetURL(alias string) (string, error) {
 		return "", fmt.Errorf("%s: execute statement: %w", fn, err)
 	}
 
-	return resUrl, nil
+	return resURL, nil
 }
 
 func (s *Storage) DeleteURL(alias string) error {
 	const fn = "storage.sqlite.DeleteUrl"
-	stmt, err := s.db.Prepare("DELETE FROM url WHERE alias = ?")
-	if err != nil {
-		return fmt.Errorf("%s: prepare statement %w", fn, err)
-	}
-	_, err = stmt.Exec(alias)
+	_, err := s.db.Exec("DELETE FROM url WHERE alias = ?")
 	if err != nil {
 		return fmt.Errorf("%s: execute statement: %w", fn, err)
 	}
