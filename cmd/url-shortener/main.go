@@ -42,7 +42,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/url", save.New(log, storage))
+	router.Post("/url", save.New(log, storage, cfg.AliasLength))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 
