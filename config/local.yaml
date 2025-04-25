@@ -4,6 +4,6 @@ http_server:
   address: "localhost:8082"
   timeout: 4s
   idle_timeout: 60s
+  user: "user"
+  password: "user"
 alias_length: 6
-user: "user"
-password: "user"

@@ -14,7 +14,7 @@ import (
 )
 
 type Request struct {
-	Url   string `json:"url" validate:"required,url"`
+	URL   string `json:"url" validate:"required,url"`
 	Alias string `json:"alias,omitempty"`
 }
 
@@ -65,10 +65,10 @@ func New(log *slog.Logger, urlSaver URLSaver, aliasLength int) http.HandlerFunc 
 			alias = random.NewRandomString(aliasLength)
 		}
 
-		err = urlSaver.SaveURL(req.Url, alias)
+		err = urlSaver.SaveURL(req.URL, alias)
 		if err != nil {
 			if errors.Is(err, storage.ErrURLExists) {
-				log.Info("url already exists", slog.String("url", req.Url))
+				log.Info("url already exists", slog.String("url", req.URL))
 
 				render.JSON(w, r, response.Error("url already exists"))
 
@@ -79,7 +79,7 @@ func New(log *slog.Logger, urlSaver URLSaver, aliasLength int) http.HandlerFunc 
 			return
 		}
 
-		log.Info("url saved", slog.String("url", req.Url))
+		log.Info("url saved", slog.String("url", req.URL))
 		responseOk(w, r, alias)
 	}
 
